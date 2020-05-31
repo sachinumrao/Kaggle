@@ -210,18 +210,21 @@ class BertModelClassifier(pl.LightningModule):
 
 
 if __name__ == "__main__":
+    # Device query
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     # Define configurations of Bert model
     model_config = {
         "MAX_LEN": 512,
         "TRAIN_BATCH_SIZE": 8,
         "VALID_BATCH_SIZE": 4,
         "EPOCHS": 5,
-        "LR": 0.0005,
-        "VAL_SIZE": 0.10,
+        "LR": 0.001,
+        "VAL_SIZE": 0.15,
         "BERT_MODEL": 'bert-base-uncased',
         "MODEL_PATH": '~/Data/Kaggle/real_or_not/',
         "TRAIN_FILE": '~/Data/Kaggle/real_or_not/clean_train.csv',
-        "SEED": 99
+        "SEED": 99,
+        "Device": device,
     }
 
     pl.seed_everything(model_config['SEED'])
@@ -235,7 +238,8 @@ if __name__ == "__main__":
     wandb_logger.watch(model, log='all', log_freq=100)
 
     # Create model trainer
-    trainer = pl.Trainer(max_epochs=10, logger=wandb_logger, deterministic=True, profiler=True)
+    trainer = pl.Trainer(max_epochs=10, logger=wandb_logger, deterministic=True, profiler=True,
+                         accumulate_grad_batches=8)
 
     # Train the model
     trainer.fit(model)
