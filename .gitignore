@@ -112,3 +112,8 @@ venv.bak/
 *.csv
 *.zip
 
+# datafolder
+/real_or_not/wandb/*
+/real_or_not/RealTweets/*
+/real_or_not/*.csv
+/real_or_not/.idea/*

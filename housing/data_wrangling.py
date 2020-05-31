@@ -9,7 +9,15 @@ remove_feats = ["MSSubClass", "MSZoning", "Street", "Alley",
                 "LotShape", "LandContour", "Utilities", "LotConfig",
                 "LandSlope", "Neighborhood", "Condition1", "Condition2",
                 "BldgType", "HouseStyle", "BuildTypeCat", "YearBuilt",
-                "YearRemodAdd", "RemodCat", "", ""]
+                "YearRemodAdd", "RemodCat", "RoofStyle", "RoofMatl",
+                "Exterior1st", "Exterior2nd", "MasVnrType", "ExterQual",
+                "ExterCond", "Foundation", "BsmtQual", "BsmtCond",
+                "BsmtExposure", "BsmtFinType1", "BsmtFinType2",
+                "Heating", "HeatingQC", "CentralAir", "Electrical",
+                "Functional", "FireplaceQu", "GarageType", "GarageFinish",
+
+
+                ]
 
 train_df = pd.concat([train_df, pd.get_dummies(train_df['MSSubClass'], 
             prefix='mssubclass', dummy_na=True)], axis=1)
@@ -99,3 +107,73 @@ train_df = pd.concat([train_df, pd.get_dummies(train_df['Exterior2nd'],
 
 train_df = pd.concat([train_df, pd.get_dummies(train_df['MasVnrType'], 
             prefix='mvtype', dummy_na=True)], axis=1)
+
+train_df = pd.concat([train_df, pd.get_dummies(train_df['ExterQual'], 
+            prefix='exterqual', dummy_na=True)], axis=1)
+
+train_df = pd.concat([train_df, pd.get_dummies(train_df['ExterCond'], 
+            prefix='extercond', dummy_na=True)], axis=1)
+
+train_df = pd.concat([train_df, pd.get_dummies(train_df['Foundation'], 
+            prefix='foundation', dummy_na=True)], axis=1)
+
+train_df = pd.concat([train_df, pd.get_dummies(train_df['BsmtQual'], 
+            prefix='bsmtqual', dummy_na=True)], axis=1)
+
+train_df = pd.concat([train_df, pd.get_dummies(train_df['BsmtCond'], 
+            prefix='bsmtcond', dummy_na=True)], axis=1)
+
+train_df = pd.concat([train_df, pd.get_dummies(train_df['BsmtExposure'], 
+            prefix='bsmtexp', dummy_na=True)], axis=1)
+
+train_df = pd.concat([train_df, pd.get_dummies(train_df['BsmtFinType1'], 
+            prefix='bsmtfin1', dummy_na=True)], axis=1)
+
+train_df = pd.concat([train_df, pd.get_dummies(train_df['BsmtFinType2'], 
+            prefix='bsmtfin2', dummy_na=True)], axis=1)
+
+train_df = pd.concat([train_df, pd.get_dummies(train_df['Heating'], 
+            prefix='heating', dummy_na=True)], axis=1)
+
+train_df = pd.concat([train_df, pd.get_dummies(train_df['HeatingQC'], 
+            prefix='heatingqc', dummy_na=True)], axis=1)
+
+train_df = pd.concat([train_df, pd.get_dummies(train_df['CentralAir'], 
+            prefix='centralair', dummy_na=True)], axis=1)
+
+train_df = pd.concat([train_df, pd.get_dummies(train_df['Electrical'], 
+            prefix='electrical', dummy_na=True)], axis=1)
+
+train_df["BsmtFinSF1"] = (train_df["BsmtFinSF1"]+100).apply(np.log)
+
+train_df["BsmtFinSF2"] = (train_df["BsmtFinSF2"]+100).apply(np.log)
+
+train_df["MasVnrArea"] = (train_df["MasVnrArea"]+100).apply(np.log)
+
+train_df["BsmtUnfSF"] = (train_df["BsmtUnfSF"]+100).apply(np.log)
+
+train_df["TotalBsmtSF"] = (train_df["TotalBsmtSF"]+100).apply(np.log)
+
+train_df["1stFlrSF"] = train_df["1stFlrSF"].apply(np.log)
+
+train_df["2ndFlrSF"] = (train_df["2ndFlrSF"]+100).apply(np.log)
+
+train_df["LowQualFinSF"] = (train_df["LowQualFinSF"]+100).apply(np.log)
+
+train_df["GrLivArea"] = train_df["GrLivArea"].apply(np.log)
+
+train_df = pd.concat([train_df, pd.get_dummies(train_df['KitchenQual'], 
+            prefix='kitchenqual', dummy_na=True)], axis=1)
+
+
+train_df = pd.concat([train_df, pd.get_dummies(train_df['Functional'], 
+            prefix='functional', dummy_na=True)], axis=1)
+
+train_df = pd.concat([train_df, pd.get_dummies(train_df['FireplaceQu'], 
+            prefix='fireplacequ', dummy_na=True)], axis=1)
+
+train_df = pd.concat([train_df, pd.get_dummies(train_df['GarageType'], 
+            prefix='garagetype', dummy_na=True)], axis=1)
+
+train_df = pd.concat([train_df, pd.get_dummies(train_df['GarageFinish'], 
+            prefix='garagefinish', dummy_na=True)], axis=1)
