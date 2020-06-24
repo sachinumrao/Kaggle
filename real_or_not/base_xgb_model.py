@@ -46,13 +46,13 @@ def main():
     }
 
     # Train model
-    cross_val = RepeatedStratifiedKFold(n_splits=10,
-                                        n_repeats=5,
+    cross_val = RepeatedStratifiedKFold(n_splits=5,
+                                        n_repeats=1,
                                         random_state=42)
 
     random_cv = RandomizedSearchCV(estimator=model,
                                    param_distributions=params,
-                                   n_iter=1000,
+                                   n_iter=10,
                                    n_jobs=-1,
                                    cv=cross_val,
                                    scoring='roc_auc',
@@ -61,7 +61,7 @@ def main():
                                    return_train_score=True)
 
     random_cv.fit(x_train, y_train)
-    
+
     # Save hyper parameter tuning results
     cv_df = pd.DataFrame.from_dict(random_cv.cv_results_)
     cv_df.to_csv('~/Data/Kaggle/real_or_not/cross_val_summary_1.csv', index=False)
