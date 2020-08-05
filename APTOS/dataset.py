@@ -34,15 +34,17 @@ class AptosDataset:
         }
         return data
 
-    def get_image(img_name):
+    def get_image(self, img_name):
         img_path = config.TRAIN_IMG_FOLDER + img_name + '.png'
-        img = Image(img_path)
+        img = Image.open(img_path)
         return img
 
 
 if __name__ == "__main__":
     idx = 10
     data = AptosDataset()
+    print("Dataset Length: ", data.__len__())
     x, y = data.__getitem__(idx)
+    print(x)
     print(x.shape)
     print(y)
