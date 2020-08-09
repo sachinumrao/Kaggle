@@ -31,8 +31,8 @@ class AptosDataset(Dataset):
         y = torch.tensor(y)
 
         data = {
-            'x': x,
-            'y': y
+            'img': x,
+            'target': y
         }
         return data
 
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     data = AptosDataset()
     print("Dataset Length: ", data.__len__())
     sample = data[idx]
-    img = sample['x']
-    target = sample['y']
+    img = sample['img']
+    target = sample['target']
     print("Shape of Input: ", img.shape)
     print("Target: ", target)
