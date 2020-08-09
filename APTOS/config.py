@@ -1,3 +1,3 @@
-TRAIN_CSV_FILE = '~/Data/Kaggle//aptos2019-blindness-detection/train.csv'
-TRAIN_IMG_FOLDER = '~/Data/Kaggle//aptos2019-blindness-detection/train_images/'
+TRAIN_CSV_FILE = '../../../Data/Kaggle/APTOS/train.csv'
+TRAIN_IMG_FOLDER = '../../../Data/Kaggle/APTOS/train_images/'
 IMG_SIZE = 256
