@@ -9,22 +9,23 @@ import config
 
 class AptosDataset(Dataset):
 
-    def __init__(self):
-        self.train_data = pd.read_csv(config.TRAIN_CSV_FILE)
-        self.train_folder = config.TRAIN_IMG_FOLDER
+    def __init__(self, df):
+
+        self.data = df
+        self.data_folder = config.TRAIN_IMG_FOLDER
         self.img_transform = transforms.Compose([
                                 transforms.Resize(config.IMG_SIZE),
                                 transforms.ToTensor(),
                                 transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-        ])
+                            ])
 
     def __len__(self):
-        N = self.train_data.shape[0]
+        N = self.data.shape[0]
         return N
 
     def __getitem__(self, idx):
-        y = self.train_data['diagnosis'].iloc[idx]
-        img_name = self.train_data['id_code'].iloc[idx]
+        y = self.data['diagnosis'].iloc[idx]
+        img_name = self.data['id_code'].iloc[idx]
         x = self.get_image(img_name)
         x = self.img_transform(x)
         
@@ -37,7 +38,7 @@ class AptosDataset(Dataset):
         return data
 
     def get_image(self, img_name):
-        img_path = config.TRAIN_IMG_FOLDER + img_name + '.png'
+        img_path = self.data_folder + img_name + '.png'
         img = Image.open(img_path)
 
         return img
