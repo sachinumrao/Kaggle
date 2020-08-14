@@ -5,7 +5,8 @@ from PIL import Image
 import numpy as np
 import pandas as pd
 from torchvision.transforms.transforms import Normalize, Resize, ToTensor
-import config 
+import config
+from config import IMG_SIZE 
 
 class AptosDataset(Dataset):
 
@@ -14,7 +15,7 @@ class AptosDataset(Dataset):
         self.data = df
         self.data_folder = config.TRAIN_IMG_FOLDER
         self.img_transform = transforms.Compose([
-                                transforms.Resize(config.IMG_SIZE),
+                                transforms.Resize((config.IMG_SIZE, config.IMG_SIZE)),
                                 transforms.ToTensor(),
                                 transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                             ])
@@ -31,10 +32,7 @@ class AptosDataset(Dataset):
         
         y = torch.tensor(y)
 
-        data = {
-            'img': x,
-            'target': y
-        }
+        data = (x, y)
         return data
 
     def get_image(self, img_name):
