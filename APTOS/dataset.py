@@ -10,10 +10,15 @@ from config import IMG_SIZE
 
 class AptosDataset(Dataset):
 
-    def __init__(self, df):
+    def __init__(self, df, isTest=False):
 
         self.data = df
-        self.data_folder = config.TRAIN_IMG_FOLDER
+        self.isTest = isTest
+        if isTest:
+            self.data_folder = config.TEST_IMG_FOLDER
+        else:
+            self.data_folder = config.TRAIN_IMG_FOLDER
+        
         self.img_transform = transforms.Compose([
                                 transforms.Resize((config.IMG_SIZE, config.IMG_SIZE)),
                                 transforms.ToTensor(),
@@ -25,18 +30,27 @@ class AptosDataset(Dataset):
         return N
 
     def __getitem__(self, idx):
-        y = self.data['diagnosis'].iloc[idx]
+        
+        if not self.isTest:
+            y = self.data['diagnosis'].iloc[idx]
+        else:
+            y = 0
+            
         img_name = self.data['id_code'].iloc[idx]
-        x = self.get_image(img_name)
+        img_path = self.data_folder + img_name + '.png'
+        x = self.get_image(img_path)
         x = self.img_transform(x)
         
         y = torch.tensor(y)
 
-        data = (x, y)
+        if not self.isTest:
+            data = (x, y)
+        else:
+            data = (x, y, img_name)
+            
         return data
 
-    def get_image(self, img_name):
-        img_path = self.data_folder + img_name + '.png'
+    def get_image(self, img_path):
         img = Image.open(img_path)
 
         return img
