@@ -9,16 +9,18 @@ import optuna
 
 def optimize(trial, x, y):
     entropy = trial.suggest_categorical("criterion", ['gini', 'entropy'])
-    n_estimators = trial.suggest_int("n_estimators", 100, 500)
-    max_depth = trial.suggest_int("max_depth", 3, 6)
+    n_estimators = trial.suggest_int("n_estimators", 200, 600)
+    max_depth = trial.suggest_int("max_depth", 5, 10)
     max_features = trial.suggest_uniform("max_features", 0.01, 1.0)
+    threshold = trial.suggest_uniform("threshold", 0.3, 0.7)
 
     model = RandomForestClassifier(
         n_estimators=n_estimators,
         max_depth=max_depth,
         max_features=max_features,
         criterion=entropy,
-        n_jobs=-1
+        n_jobs=-1,
+        random_state=42
     )
 
     kf = StratifiedKFold(n_splits=5)
@@ -34,8 +36,9 @@ def optimize(trial, x, y):
         ytest = y[test_idx]
 
         model.fit(xtrain, ytrain)
-        preds = model.predict(xtest)
+        preds = model.predict_proba(xtest)
         
+        preds = (preds[:,0] < threshold).astype(np.int)
         fold_acc = accuracy_score(ytest, preds)
         accuracies.append(fold_acc)
 
@@ -53,7 +56,7 @@ def main():
     # Create optuna study
     optimization_function = partial(optimize, x=x, y=y)
     study = optuna.create_study(direction='minimize')
-    study.optimize(optimization_function, n_trials=15)  
+    study.optimize(optimization_function, n_trials=150)  
     
 
 if __name__ == "__main__":
