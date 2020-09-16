@@ -1,13 +1,16 @@
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
 from xgboost import XGBClassifier
 
 
-def score_model(file_folder, model, threshold):
+def score_model(file_folder, model, threshold, scaler):
     # get scoring data
     test_file = file_folder + 'test_processed.csv'
     df = pd.read_csv(test_file)
     data = df.values
+    
+    data = scaler.transform(data)
     
     # score the model
     y_ = model.predict_proba(data)
@@ -22,24 +25,24 @@ def score_model(file_folder, model, threshold):
     subm['Survived'] = preds
     
     # save submission file
-    subm.to_csv(file_folder + 'rf_subm_v1.csv', index=False)
+    subm.to_csv(file_folder + 'xgb_subm_v4.csv', index=False)
 
 
 def get_best_model():
-    
-    booster = None
-    eta = None
-    gamma = None
-    max_depth = None
-    min_child_weight = None
-    max_delta_step = None
-    subsample = None
-    colsample_bytree = None
-    reg_lambda = None
-    reg_alpha = None
-    tree_method = None
+    n_estimators = 411
+    booster = 'gbtree'
+    eta = 0.3523566
+    gamma = 0.451301
+    max_depth = 10
+    min_child_weight = 3.057999
+    max_delta_step = 4
+    subsample = 0.8810433666
+    colsample_bytree = 0.85334
+    reg_lambda = 0.888965
+    reg_alpha = 0.8341519
+    tree_method = 'approx'
 
-    model = model = XGBClassifier(booster=booster,
+    model = model = XGBClassifier(booster=booster, n_estimators=n_estimators,
                           verbosity=1,
                           nthread=-1,
                           eta=eta,
@@ -69,6 +72,10 @@ def train_best_model(file_folder):
     y = df['Survived'].values
     x = df.drop(['Survived'], axis=1).values
     
+    # scale the data
+    scaler = MinMaxScaler()
+    scaler.fit(x)
+    x = scaler.transform(x)
     # create model instance with optimal params
     model = get_best_model()
       
@@ -76,19 +83,19 @@ def train_best_model(file_folder):
     model.fit(x, y)
     
     # return trained model
-    return model
+    return model, scaler
 
 
 def main():
     file_folder = '~/Data/Kaggle/Titanic/'
     
-    threshold = 0.4844103598537662
+    threshold = 0.66090088097
     
     print("Training Model...")
-    model = train_best_model(file_folder)
+    model, scaler = train_best_model(file_folder)
     
     print("Scoring Model...")
-    score_model(file_folder, model, threshold)
+    score_model(file_folder, model, threshold, scaler)
     
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
-from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import accuracy_score, roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 from functools import partial
 import optuna
@@ -9,9 +10,14 @@ from xgboost import XGBClassifier
 
 def optimize(trial, x, y):
     
+    # scale the data
+    scaler = MinMaxScaler()
+    scaler.fit(x)
+    x = scaler.transform(x)
+    
     # define xgboost params to tune
-    booster = trial.suggest_categorical("booster", ['gbtree', 'dart'])
-    eta = trial.suggest_uniform("eta", 0.01, 0.3)
+    n_estimators = trial.suggest_int("n_estimators", 200, 700)
+    eta = trial.suggest_uniform("eta", 0.01, 0.4)
     gamma = trial.suggest_uniform("gamma", 0, 5)
     max_depth = trial.suggest_int("max_depth", 4, 10)
     min_child_weight = trial.suggest_uniform("min_child_weight", 0, 5)
@@ -24,8 +30,9 @@ def optimize(trial, x, y):
     
     threshold = trial.suggest_uniform("threshold", 0.3, 0.7)
 
-    model = XGBClassifier(booster=booster,
-                          verbosity=1,
+    model = XGBClassifier(booster='gbtree',
+                          n_estimators=n_estimators,
+                          verbosity=0,
                           nthread=-1,
                           eta=eta,
                           gamma=gamma,
@@ -37,9 +44,9 @@ def optimize(trial, x, y):
                           reg_lambda=reg_lambda,
                           reg_alpha=reg_alpha,
                           tree_method=tree_method,
-                          scale_pos_weight=0.2/0.8,
+                          scale_pos_weight=3/7,
                           objective='binary:logistic',
-                          metrics='auc',
+                          metrics='logloss',
                           seed=42
                           
                           )
@@ -59,8 +66,9 @@ def optimize(trial, x, y):
         model.fit(xtrain, ytrain)
         preds = model.predict_proba(xtest)
         
-        preds = (preds[:,0] < threshold).astype(np.int)
-        fold_acc = accuracy_score(ytest, preds)
+        yhat = (preds[:,0] < threshold).astype(np.int)
+        fold_acc = accuracy_score(ytest, yhat)
+        # fold_auc = roc_auc_score(ytest, preds[:,0])
         accuracies.append(fold_acc)
 
     return -1.0 * np.mean(accuracies)
@@ -75,7 +83,7 @@ def main():
     x = df.drop(['Survived'], axis=1).values   
     
     # Create optuna study
-    num_trials=200
+    num_trials=300
     optimization_function = partial(optimize, x=x, y=y)
     study = optuna.create_study(direction='minimize')
     study.optimize(optimization_function, n_trials=num_trials)  

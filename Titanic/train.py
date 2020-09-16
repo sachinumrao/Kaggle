@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 from functools import partial
 import optuna
@@ -38,9 +38,10 @@ def optimize(trial, x, y):
         model.fit(xtrain, ytrain)
         preds = model.predict_proba(xtest)
         
-        preds = (preds[:,0] < threshold).astype(np.int)
-        fold_acc = accuracy_score(ytest, preds)
-        accuracies.append(fold_acc)
+        yhat = (preds[:,0] < threshold).astype(np.int)
+        # fold_acc = accuracy_score(ytest, preds)
+        fold_auc = roc_auc_score(ytest, preds[:,0])
+        accuracies.append(fold_auc)
 
     return -1.0 * np.mean(accuracies)
 
