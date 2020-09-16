@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBClassifier
 
 
 def score_model(file_folder, model, threshold):
@@ -27,11 +27,37 @@ def score_model(file_folder, model, threshold):
 
 def get_best_model():
     
-    model = RandomForestClassifier(criterion='gini',
-                                   n_estimators=402,
-                                   max_depth=8,
-                                   max_features=0.686454,
-                                   random_state=42)
+    booster = None
+    eta = None
+    gamma = None
+    max_depth = None
+    min_child_weight = None
+    max_delta_step = None
+    subsample = None
+    colsample_bytree = None
+    reg_lambda = None
+    reg_alpha = None
+    tree_method = None
+
+    model = model = XGBClassifier(booster=booster,
+                          verbosity=1,
+                          nthread=-1,
+                          eta=eta,
+                          gamma=gamma,
+                          max_depth=max_depth,
+                          min_child_weight=min_child_weight,
+                          max_delta_step=max_delta_step,
+                          subsample=subsample,
+                          colsample_bytree=colsample_bytree,
+                          reg_lambda=reg_lambda,
+                          reg_alpha=reg_alpha,
+                          tree_method=tree_method,
+                          scale_pos_weight=0.2/0.8,
+                          objective='binary:logistic',
+                          metrics='auc',
+                          seed=42
+                          
+                          )
     return model
 
     
@@ -68,5 +94,3 @@ def main():
 if __name__ == "__main__":
     main()
     
-    
-## 'criterion': 'gini', 'n_estimators': 402, 'max_depth': 8, 'max_features': 0.6864543886802769, 'threshold': 0.4844103598537662
